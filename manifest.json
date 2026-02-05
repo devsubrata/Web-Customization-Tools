@@ -1,0 +1,44 @@
+{
+    "manifest_version": 3,
+    "name": "Web Customization & Tools",
+    "version": "1.0",
+    "permissions": ["scripting", "activeTab", "clipboardWrite", "tabs"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icon.png",
+            "48": "icon.png",
+            "128": "icon.png"
+        }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["icons/*.png"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["libs/jsQR.js", "libs/tesseract.min.js", "libs/UtilityFunctions.js", "content.js"],
+            "css": ["css/selector.css", "css/modal.css"]
+        }
+    ],
+    "commands": {
+        "capture-ocr": {
+            "suggested_key": {
+                "default": "Alt+S"
+            },
+            "description": "Start OCR capture"
+        },
+        "capture-img": {
+            "suggested_key": {
+                "default": "Alt+W"
+            },
+            "description": "Start Screen capture"
+        }
+    }
+}

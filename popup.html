@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Change Document Title & Icon</title>
+        <style>
+            body {
+                font-family: system-ui, sans-serif;
+                background: #c5f5c5;
+                margin: 0;
+                padding: 1rem;
+                min-width: 450px;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+                font-weight: 600;
+                color: #5208e5;
+                text-align: center;
+                margin-bottom: 0.5rem;
+            }
+            #grabElm,
+            #titleInput {
+                flex: 1;
+            }
+
+            input,
+            select,
+            button {
+                padding: 0.5rem;
+                font-size: 1rem;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                outline: none;
+            }
+
+            button {
+                background: #3b82f6;
+                color: white;
+                cursor: pointer;
+                border: none;
+            }
+
+            button:hover {
+                background: #2563eb;
+            }
+            #delElement:hover {
+                background: red;
+            }
+            #symbols {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 3px;
+                max-height: 200px;
+                overflow-y: auto;
+                background: #fff;
+                border-radius: 10px;
+            }
+
+            .symbol {
+                font-size: 22px;
+                cursor: pointer;
+                padding: 3px;
+                border-radius: 6px;
+                transition:
+                    background 0.2s,
+                    transform 0.1s;
+            }
+
+            .symbol:hover {
+                background: #f0f0f0;
+                transform: scale(1.2);
+            }
+
+            .copied {
+                background: #d1ffd1 !important;
+            }
+            #backgroundDiv {
+                display: flex;
+                align-items: center;
+            }
+            .color-box {
+                width: 40px;
+                height: 40px;
+                border: 2px solid rgba(0, 0, 0, 0.3);
+                cursor: pointer;
+                margin: 5px;
+                border-radius: 5px;
+            }
+            .color-input {
+                display: inline-block;
+                padding: 0;
+                width: 40px;
+                height: 40px;
+                border: none;
+                cursor: pointer;
+            }
+            .center {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 5px;
+            }
+            .wrap {
+                flex-wrap: wrap;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Web Customization & Tools</h1>
+        <div class="center">
+            <input id="titleInput" placeholder="Enter new title..." />
+            <select id="faviconSelector">
+                <option value="./icons/Butterfly.32.png">Butterfly</option>
+                <option value="./icons/Frog.32.png">Frog</option>
+                <option value="./icons/Hamster.32.png">Hamster</option>
+                <option value="./icons/Owl.32.png">Owl</option>
+                <option value="./icons/Penguin.32.png">Penguin</option>
+                <option value="./icons/Piranha-Fish.32.png">Piranha-Fish</option>
+                <option value="./icons/Tiger.32.png">Tiger</option>
+                <option value="./icons/Wolf.32.png">Wolf</option>
+            </select>
+        </div>
+        <div class="center">
+            <button id="setTitleIconBtn">Set Title & Icon</button>
+            <button id="scanQRcode" title="Scan QR code">QR</button>
+            <button id="captureText" title="Capture Text">OCR</button>
+            <button id="captureImage" title="Capture Image">IMG</button>
+            <button id="delColorDiv">R</button>
+        </div>
+        <div class="center">
+            <input id="grabElm" placeholder="elements to select..." />
+            <input id="attributeCheck" type="checkbox" title="select if attribute selector" />
+        </div>
+        <div class="center wrap">
+            <select id="styleSelect">
+                <option value="">Select Style</option>
+                <option value="a-txt-none">a-txt-none</option>
+                <option value="diplayNone">display:none</option>
+                <option value="OpenSansFont">OpenSansFont</option>
+                <option value="highlight">Highlight</option>
+                <option value="fade">Fade</option>
+                <option value="border">Add Border</option>
+            </select>
+            <button id="setStyle">SetStyle</button>
+            <button id="delElement">Delete</button>
+            <button id="clrInput">Clear</button>
+        </div>
+        <div id="symbols"></div>
+        <div id="backgroundDiv"></div>
+        <script src="popup.js"></script>
+    </body>
+</html>
