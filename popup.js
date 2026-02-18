@@ -142,16 +142,83 @@ document.addEventListener("DOMContentLoaded", () => {
         container.appendChild(span);
     });
 
-    const bgColors = ["#ffffff", "#000000", "#b3e037"];
+    const bgColors = [
+        "#7e9a9a",
+        "#8b8681",
+        "#696468",
+        "#f6d8ac",
+        "#2a6592",
+        "#8ec3eb",
+        "#b5e9e9",
+        "#5c5174",
+        "#66669a",
+        "#aaa7cc",
+        "#926d88",
+        "#be9fbf",
+        "#1F1B24",
+        "#24191d",
+        "#332940",
+        "#702917",
+        "#121212",
+        "#00172D",
+        "#20343D",
+        "#BB86FC",
+        "#3C0466",
+        "#00498D",
+        "#03DAC5",
+        "#ffa500",
+        "#dcb909",
+        "#cbd902",
+        "#84cc16",
+        "#b7fa00",
+        "#00ff00",
+        "#256A2C",
+        "#009c1a",
+        "#365314",
+        "#134e4a",
+        "#00faaf",
+        "#12c1ed",
+        "#00ffff",
+        "#ff0000",
+        "#fe3b00",
+        "#f43f5e",
+        "#ff0066",
+        "#9f1239",
+        "#4B0001",
+        "#B163FF",
+        "#ffff00",
+        "#964B00",
+        "#BE5103",
+        "#050372",
+        "#0000ff",
+        "#0047ab",
+        "#2B0057",
+        "#51158C",
+        "#7F00FF",
+        "#6601ff",
+        "#cb00cc",
+        "#ff00ff",
+        "#cc00ff",
+        "#ffffff",
+        "#000000",
+    ];
     const colorContainer = document.getElementById("backgroundDiv");
 
     colorContainer.innerHTML = "";
+
     bgColors.forEach((color) => {
         const colorBox = document.createElement("div");
         colorBox.classList.add("color-box");
         colorBox.style.background = color;
         colorBox.title = "Set background color";
-        colorBox.onclick = () => setBackground(color);
+        colorBox.onclick = () => {
+            if (document.getElementById("checkOnlyCopy")?.checked) {
+                navigator.clipboard.writeText(color);
+            } else {
+                setBackground(color);
+            }
+        };
+
         colorContainer.appendChild(colorBox);
     });
 
@@ -160,17 +227,23 @@ document.addEventListener("DOMContentLoaded", () => {
     colorInput.value = "#ff0000"; // default color
     colorInput.classList.add("color-input");
     colorInput.title = "Set background color";
-    colorInput.addEventListener("input", (e) => {
-        setBackground(e.target.value);
-        navigator.clipboard.writeText(e.target.value);
-    });
+    colorInput.addEventListener("input", (e) => setBackground(e.target.value));
     colorContainer.appendChild(colorInput);
+
+    const onlyCopyColorCode = document.createElement("input");
+    onlyCopyColorCode.type = "checkbox";
+    onlyCopyColorCode.id = "checkOnlyCopy";
+    onlyCopyColorCode.title = "Copy only color code";
+    onlyCopyColorCode.checked = true;
+    colorContainer.appendChild(onlyCopyColorCode);
 
     function setBackground(color) {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             chrome.scripting.executeScript({
                 target: { tabId: tabs[0].id },
-                func: (color) => (document.body.style.background = color),
+                func: (color) => {
+                    document.body.style.background = color;
+                },
                 args: [color],
             });
         });

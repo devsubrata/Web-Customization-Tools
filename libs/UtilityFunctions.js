@@ -41,3 +41,30 @@ function makeDraggable(el, calcNew = true) {
         return [newLeft, newTop];
     }
 }
+function joinSelectedLines(textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+
+    // Nothing selected → do nothing
+    if (start === end) return;
+
+    const value = textarea.value;
+
+    const before = value.slice(0, start);
+    const selected = value.slice(start, end);
+    const after = value.slice(end);
+
+    // Normalize line breaks and collapse into single spaces
+    const joined = selected
+        .replace(/\r?\n+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    textarea.value = before + joined + after;
+
+    // Restore selection around modified text
+    textarea.selectionStart = start;
+    textarea.selectionEnd = start + joined.length;
+
+    textarea.focus();
+}

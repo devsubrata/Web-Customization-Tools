@@ -198,33 +198,33 @@ function showModal(text, url) {
     editor.focus();
 }
 
-function joinSelectedLines(textarea) {
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
+// function joinSelectedLines(textarea) {
+//     const start = textarea.selectionStart;
+//     const end = textarea.selectionEnd;
 
-    // Nothing selected → do nothing
-    if (start === end) return;
+//     // Nothing selected → do nothing
+//     if (start === end) return;
 
-    const value = textarea.value;
+//     const value = textarea.value;
 
-    const before = value.slice(0, start);
-    const selected = value.slice(start, end);
-    const after = value.slice(end);
+//     const before = value.slice(0, start);
+//     const selected = value.slice(start, end);
+//     const after = value.slice(end);
 
-    // Normalize line breaks and collapse into single spaces
-    const joined = selected
-        .replace(/\r?\n+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+//     // Normalize line breaks and collapse into single spaces
+//     const joined = selected
+//         .replace(/\r?\n+/g, " ")
+//         .replace(/\s+/g, " ")
+//         .trim();
 
-    textarea.value = before + joined + after;
+//     textarea.value = before + joined + after;
 
-    // Restore selection around modified text
-    textarea.selectionStart = start;
-    textarea.selectionEnd = start + joined.length;
+//     // Restore selection around modified text
+//     textarea.selectionStart = start;
+//     textarea.selectionEnd = start + joined.length;
 
-    textarea.focus();
-}
+//     textarea.focus();
+// }
 
 function isValidURL(str) {
     try {
