@@ -206,13 +206,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     colorContainer.innerHTML = "";
 
+    let isCopyColorCode = localStorage.getItem("isCopyColorCode") === "true";
+
     bgColors.forEach((color) => {
         const colorBox = document.createElement("div");
         colorBox.classList.add("color-box");
         colorBox.style.background = color;
         colorBox.title = "Set background color";
         colorBox.onclick = () => {
-            if (document.getElementById("checkOnlyCopy")?.checked) {
+            if (isCopyColorCode) {
                 navigator.clipboard.writeText(color);
             } else {
                 setBackground(color);
@@ -234,8 +236,13 @@ document.addEventListener("DOMContentLoaded", () => {
     onlyCopyColorCode.type = "checkbox";
     onlyCopyColorCode.id = "checkOnlyCopy";
     onlyCopyColorCode.title = "Copy only color code";
-    onlyCopyColorCode.checked = true;
+    onlyCopyColorCode.checked = isCopyColorCode;
     colorContainer.appendChild(onlyCopyColorCode);
+
+    onlyCopyColorCode.addEventListener("change", () => {
+        isCopyColorCode = onlyCopyColorCode.checked;
+        localStorage.setItem("isCopyColorCode", isCopyColorCode);
+    });
 
     function setBackground(color) {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -342,4 +349,107 @@ document.addEventListener("DOMContentLoaded", () => {
         chrome.runtime.sendMessage({ action: "captureQR", mode: "IMAGE" });
         document.body.style.display = "none";
     });
+    document.getElementById("downloadBBCmp3").onclick = async () => {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+                const link = document.querySelector("a.bbcle-download-extension-mp3");
+                const titleEl = document.querySelectorAll('h3[dir="ltr"]')[1];
+
+                if (!link || !titleEl) return null;
+
+                return {
+                    mp3Url: link.href,
+                    title: titleEl.textContent.trim(),
+                };
+            },
+        });
+
+        const data = results[0].result;
+
+        if (!data) {
+            alert("MP3 or title not found.");
+            return;
+        }
+
+        const { mp3Url, title } = data;
+
+        let prefix;
+        // Extract prefix like "250428_tews"
+        const filePart = mp3Url.split("/").pop();
+        if (filePart.includes("6_minute_english")) prefix = filePart.split("_").slice(0, 4).join("_");
+        else prefix = filePart.split("_").slice(0, 2).join("_");
+
+        // Clean title for filename
+        const cleanTitle = title
+            .replace(/[^\w\s]/g, "") // remove apostrophes etc.
+            .replace(/\s+/g, " ");
+
+        const newFilename = `${prefix} ➜ ${cleanTitle}.mp3`;
+
+        chrome.downloads.download({
+            url: mp3Url,
+            filename: newFilename,
+        });
+    };
+    document.getElementById("downloadBBCimage").onclick = async () => {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+                const meta = document.querySelector('meta[property="og:image"]');
+                return meta ? meta.content : null;
+            },
+        });
+        const imageUrl = results[0].result;
+        if (!imageUrl) {
+            console.log("No og:image found");
+            return;
+        }
+        // Fetch from extension context (bypasses CORS if host_permissions are set)
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+
+        // Convert to ImageBitmap
+        const bitmap = await createImageBitmap(blob);
+
+        // Draw on canvas
+        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(bitmap, 0, 0);
+
+        // Convert to PNG blob
+        const pngBlob = await canvas.convertToBlob({ type: "image/png" });
+
+        // Copy PNG to clipboard
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })]);
+        showModal();
+    };
+
+    document.getElementById("downloadPdfs").addEventListener("click", async () => {
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true,
+        });
+
+        chrome.tabs.sendMessage(tab.id, {
+            action: "collectPDFs",
+        });
+    });
+    // Popup → trigger
+    // Content → collect URLs
+    // Background → fetch PDFs
+    // Background → merge using pdf-lib
+    // Background → convert to Base64 safely
+    // Background → download
+    function showModal() {
+        const modal = document.getElementById("successModal");
+        modal.classList.remove("hidden");
+
+        setTimeout(() => {
+            modal.classList.add("hidden");
+        }, 1000);
+    }
 });

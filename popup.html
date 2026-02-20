@@ -122,6 +122,33 @@
             .wrap {
                 flex-wrap: wrap;
             }
+            .modal {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.4);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            .modal-content {
+                background: white;
+                padding: 16px 20px;
+                border-radius: 8px;
+                text-align: center;
+                width: 220px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+
+            .modal-content button {
+                margin-top: 10px;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
         </style>
     </head>
     <body>
@@ -145,6 +172,9 @@
             <button id="captureText" title="Capture Text">OCR</button>
             <button id="captureImage" title="Capture Image">IMG</button>
             <button id="delColorDiv" style="display: none">R</button>
+            <button id="downloadBBCimage" style="background: none; margin: 0; padding: 0" title="Download image from BBC">🖼️</button>
+            <button id="downloadBBCmp3" style="background: none; margin: 0; padding: 0" title="Download audio from BBC">🎶</button>
+            <button id="downloadPdfs" style="background: none; margin: 0; padding: 0" title="Download pdf from BBC">📋</button>
         </div>
         <div class="center">
             <input id="grabElm" placeholder="elements to select..." />
@@ -153,9 +183,9 @@
         <div class="center wrap">
             <select id="styleSelect">
                 <option value="">Select Style</option>
+                <option value="OpenSansFont">OpenSansFont</option>
                 <option value="a-txt-none">a-txt-none</option>
                 <option value="diplayNone">display:none</option>
-                <option value="OpenSansFont">OpenSansFont</option>
                 <option value="highlight">Highlight</option>
                 <option value="fade">Fade</option>
                 <option value="border">Add Border</option>
@@ -166,6 +196,12 @@
         </div>
         <div id="symbols"></div>
         <div id="backgroundDiv"></div>
+        <div id="successModal" class="modal hidden">
+            <div class="modal-content">
+                <p>✅ Image copied to clipboard!</p>
+                <button id="closeModal">OK</button>
+            </div>
+        </div>
         <script src="popup.js"></script>
     </body>
 </html>

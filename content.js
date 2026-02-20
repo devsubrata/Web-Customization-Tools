@@ -198,34 +198,6 @@ function showModal(text, url) {
     editor.focus();
 }
 
-// function joinSelectedLines(textarea) {
-//     const start = textarea.selectionStart;
-//     const end = textarea.selectionEnd;
-
-//     // Nothing selected → do nothing
-//     if (start === end) return;
-
-//     const value = textarea.value;
-
-//     const before = value.slice(0, start);
-//     const selected = value.slice(start, end);
-//     const after = value.slice(end);
-
-//     // Normalize line breaks and collapse into single spaces
-//     const joined = selected
-//         .replace(/\r?\n+/g, " ")
-//         .replace(/\s+/g, " ")
-//         .trim();
-
-//     textarea.value = before + joined + after;
-
-//     // Restore selection around modified text
-//     textarea.selectionStart = start;
-//     textarea.selectionEnd = start + joined.length;
-
-//     textarea.focus();
-// }
-
 function isValidURL(str) {
     try {
         new URL(str);
@@ -317,3 +289,33 @@ function displayImage(canvas) {
 
     document.body.appendChild(overlay);
 }
+
+chrome.runtime.onMessage.addListener((message) => {
+    if (message.action === "collectPDFs") {
+        const pdfUrls = [...document.querySelectorAll(".bbcle-download-extension-pdf")].map((el) => el.href);
+        const titleEl = document.querySelectorAll('h3[dir="ltr"]')[1];
+
+        let prefix;
+        const filePart = pdfUrls[0]?.split("/").pop();
+
+        if (filePart.includes("6_minute_english") || filePart.includes("6min_english")) prefix = filePart.split("_").slice(0, 4).join("_");
+        else if (filePart.includes("tews")) prefix = filePart.split("_").slice(0, 2).join("_");
+        else prefix = filePart.split("_").slice(0, 1).join("_");
+
+        const name = `${prefix} ➜ ${titleEl.textContent.trim()}.pdf`;
+        const filename = name.replace(/[\\\/:*?"<>|]/g, "");
+
+        chrome.runtime.sendMessage({
+            action: "mergePDFs",
+            urls: pdfUrls,
+            filename,
+        });
+    }
+});
+
+// Popup → trigger
+// Content → collect URLs
+// Background → fetch PDFs
+// Background → merge using pdf-lib
+// Background → convert to Base64 safely
+// Background → download
