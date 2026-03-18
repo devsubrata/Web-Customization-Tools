@@ -361,20 +361,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("grabElm").value = "";
     }
 
-    document.getElementById("scanQRcode").addEventListener("click", () => {
-        chrome.runtime.sendMessage({ action: "captureQR", mode: "QR" }, (response) => {
-            console.log("Background replied:", response);
-        });
-        document.body.style.display = "none";
-    });
-    document.getElementById("captureText").addEventListener("click", () => {
-        chrome.runtime.sendMessage({ action: "captureQR", mode: "OCR" });
-        document.body.style.display = "none";
-    });
-    document.getElementById("captureImage").addEventListener("click", () => {
-        chrome.runtime.sendMessage({ action: "captureQR", mode: "IMAGE" });
-        document.body.style.display = "none";
-    });
     document.getElementById("downloadBBCmp3").onclick = async () => {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
