@@ -11,9 +11,23 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    // <select id="faviconSelector">
+    const favicons = [
+        "./icons/Butterfly.32.png",
+        "./icons/Frog.32.png",
+        "./icons/Hamster.32.png",
+        "./icons/Owl.32.png",
+        "./icons/Penguin.32.png",
+        "./icons/Piranha-Fish.32.png",
+        "./icons/Tiger.32.png",
+        "./icons/Wolf.32.png",
+    ];
+
     // --- Change Title & Favicon ---
     function sendTitleAndIcon() {
-        const relativePath = selector.value;
+        let relativePath = selector.value;
+        if (relativePath === "") relativePath = favicons[Math.floor(Math.random() * favicons.length)];
+
         const fullIconURL = chrome.runtime.getURL(relativePath);
         const newTitle = input.value.trim();
 
@@ -39,6 +53,26 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") sendTitleAndIcon();
     });
+
+    function scrollWindow(direction) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.scripting.executeScript({
+                target: { tabId: tabs[0].id },
+                func: (direction) => {
+                    if (direction === "down") {
+                        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+                    } else {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                },
+                args: [direction],
+            });
+        });
+    }
+    document.getElementById("scrollDown").onclick = () => scrollWindow("down");
+    document.getElementById("scrollUP").onclick = () => scrollWindow("up");
+    document.querySelector(".scroll-div .goup").onclick = () => scrollWindow("up");
+    document.querySelector(".scroll-div .godown").onclick = () => scrollWindow("down");
 
     // --- Populate Symbols ---
     const symbols = [
@@ -466,4 +500,86 @@ document.addEventListener("DOMContentLoaded", () => {
             modal.classList.add("hidden");
         }, 1000);
     }
+
+    document.getElementById("copyWebURL").onclick = async () => {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        await navigator.clipboard.writeText(tab.url);
+        alert("Web url copied");
+    };
+    document.getElementById("copyAudioLink").onclick = async () => {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+                const link = document.querySelector("a.bbcle-download-extension-mp3");
+                if (!link) return null;
+                return link.href;
+            },
+        });
+        const data = results[0].result;
+        if (!data) {
+            alert("Not found.");
+            return;
+        }
+        await navigator.clipboard.writeText(data);
+        alert("Link Copied");
+    };
+    document.getElementById("copyImgURL").onclick = async () => {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+                const meta = document.querySelector('meta[property="og:image"]');
+                return meta ? meta.content : null;
+            },
+        });
+        const imageUrl = results[0].result;
+        if (!imageUrl) {
+            alert("No og:image found");
+            return;
+        }
+        await navigator.clipboard.writeText(imageUrl);
+        alert("Link Copied");
+    };
+    document.getElementById("logResources").onclick = async () => {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: (webUrl) => {
+                const episodeName = document.querySelectorAll('h3[dir="ltr"]')[0].textContent.trim();
+                const titleElm = document.querySelectorAll('h3[dir="ltr"]')[1];
+
+                const h3 = document.querySelector(".widget-bbcle-featuresubheader h3");
+                const episode = h3.querySelector("b")?.textContent.trim();
+                const fullText = h3.textContent.replace(/\s+/g, " ").trim();
+                const date = fullText.replace(episode, "").replace("/", "").trim();
+
+                const meta = document.querySelector('meta[property="og:image"]');
+
+                const link = document.querySelector("a.bbcle-download-extension-mp3");
+
+                const pdfUrls = [...document.querySelectorAll(".bbcle-download-extension-pdf")].map((el) => el.href);
+
+                let type = null;
+                if (episodeName === "6 Minute English") type = "SME";
+                else if (episodeName === "The English We Speak") type = "TEWS";
+                else if (episodeName === "Learning English from the News") type = "LEFTN";
+
+                const resources = {
+                    type,
+                    webUrl: webUrl,
+                    episode: `${episode} / ${date}`,
+                    title: titleElm.textContent,
+                    bgImageLink: meta ? meta.content : null,
+                    audioLink: link ? link.href : null,
+                    transcripts: pdfUrls.length > 0 ? pdfUrls : null,
+                };
+
+                return resources;
+            },
+            args: [tab.url],
+        });
+        await navigator.clipboard.writeText(JSON.stringify(results[0].result, null, 4));
+        showModal();
+    };
 });

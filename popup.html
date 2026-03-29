@@ -152,10 +152,15 @@
         </style>
     </head>
     <body>
+        <div class="scroll-div" style="display: inline-block; position: fixed; top: 5px; right: 5px">
+            <button class="goup" style="background: none; margin: 0; padding: 0; color: #601ce9">⏫</button>
+            <button class="godown" style="background: none; margin: 0; padding: 0; color: #601ce9">⏬</button>
+        </div>
         <h1>Web Customization & Tools</h1>
         <div class="center">
             <input id="titleInput" placeholder="Enter new title..." />
             <select id="faviconSelector">
+                <option value="">Random Select</option>
                 <option value="./icons/Butterfly.32.png">Butterfly</option>
                 <option value="./icons/Frog.32.png">Frog</option>
                 <option value="./icons/Hamster.32.png">Hamster</option>
@@ -167,11 +172,33 @@
             </select>
         </div>
         <div class="center">
+            <button id="scrollDown" title="Scroll to bottom" style="background: none; cursor: pointer; margin: 0; padding: 0">⏬</button>
+            <button id="scrollUP" title="Scroll to top" style="background: none; cursor: pointer; margin: 0; padding: 0">⏫</button>
             <button id="setTitleIconBtn">Set Title & Icon</button>
             <button id="delColorDiv" style="display: none">R</button>
             <button id="downloadBBCimage" style="background: none; margin: 0; padding: 0" title="Download image from BBC">🖼️</button>
             <button id="downloadBBCmp3" style="background: none; margin: 0; padding: 0" title="Download audio from BBC">🎶</button>
             <button id="downloadPdfs" style="background: none; margin: 0; padding: 0" title="Download pdf from BBC">📋</button>
+            <button id="copyWebURL" style="border: 1px solid grey; background: none; margin: 0; padding: 2px; color: #444" title="Copy Web URL">
+                W🔗
+            </button>
+            <button id="copyAudioLink" style="border: 1px solid grey; background: none; margin: 0; padding: 2px; color: #444" title="Copy Audio Link">
+                A🔗
+            </button>
+            <button
+                id="copyImgURL"
+                style="border: 1px solid grey; background: none; margin: 0; padding: 2px; color: #444"
+                title="Copy Background Image Link"
+            >
+                I🔗
+            </button>
+            <button
+                id="logResources"
+                style="border: 1px solid grey; background: none; margin: 0; padding: 2px; color: #444"
+                title="Log all resources"
+            >
+                lg
+            </button>
         </div>
         <div class="center">
             <input id="grabElm" placeholder="elements to select..." />
@@ -195,8 +222,8 @@
         <div id="backgroundDiv"></div>
         <div id="successModal" class="modal hidden">
             <div class="modal-content">
-                <p>✅ Image copied to clipboard!</p>
-                <button id="closeModal">OK</button>
+                <p>✅ Copied to clipboard!</p>
+                <button id="closeModal" hidden>OK</button>
             </div>
         </div>
         <script src="popup.js"></script>
